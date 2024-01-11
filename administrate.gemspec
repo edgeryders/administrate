@@ -13,9 +13,9 @@ Gem::Specification.new do |s|
 
   s.files = Dir["{app,lib,docs}/**/*", "config/locales/**/*", "LICENSE", "Rakefile"]
 
-  s.add_dependency "actionpack", ">= 5.0"
-  s.add_dependency "actionview", ">= 5.0"
-  s.add_dependency "activerecord", ">= 5.0"
+  s.add_dependency "actionpack", ">= 6.0", "< 8.0"
+  s.add_dependency "actionview", ">= 6.0", "< 8.0"
+  s.add_dependency "activerecord", ">= 6.0", "< 8.0"
 
   s.add_dependency "jquery-rails", ">= 4.0"
   s.add_dependency "kaminari", ">= 1.0"
