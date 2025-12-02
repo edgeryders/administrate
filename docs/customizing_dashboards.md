@@ -82,7 +82,8 @@ the table views and in the dropdown menu on the record forms.
 You can set multiple columns as well with direction. E.g.: `"name, email DESC"`.
 
 `:scope` - Specifies a custom scope inside a callable. Useful for preloading.
-Example: `.with_options(scope: -> { MyModel.includes(:rel).limit(5) })`
+Example #1: `.with_options(scope: -> { MyModel.includes(:rel).limit(5) })`
+Example #2: `.with_options(scope: -> (field) { field.resource.my_models.includes(:rel).limit(5) })`
 
 `:include_blank` - Specifies if the select element to be rendered should include
 blank option. Default is `true`.
@@ -105,15 +106,18 @@ For example:
 with this, you will be able to search through the column `name` from the
 association `belongs_to :country`, from your model.
 
-`:primary_key` (deprecated) - Specifies the association's primary_key.
+`:sortable` - Specifies if sorting should be enabled in the table views.  
+Default is `true`.  
 
-`:foreign_key` (deprecated) - Specifies the name of the foreign key directly.
+`:sorting_column` - Specifies the column of the associated model to be used for sorting in the table views and dropdown menu.  
+If `sorting_column` is omitted and `order` is specified, the value of `order` will be used.  
+If neither is specified, sorting will be done using the foreign key.  
 
-`:class_name` (deprecated) - Specifies the name of the associated class.
+`:class_name` - Specifies the name of the associated class.
 
 **Field::HasMany**
 
-`:collection_attributes` - Set the columns to display in the show view. 
+`:collection_attributes` - Set the columns to display in the show view.
 Default is COLLECTION_ATTRIBUTES in dashboard.
 
 `:limit` - The number of resources (paginated) to display in the show view. To disable pagination,
@@ -123,11 +127,15 @@ set this to `0` or `false`. Default is `5`.
 
 `:direction` - What direction the sort should be in, `:asc` (default) or `:desc`.
 
-`:primary_key` (deprecated) - Specifies object's primary_key.
+`:sortable` - Specifies if sorting should be enabled in the table views.  
+Default is `true`.  
 
-`:foreign_key` (deprecated) - Specifies the name of the foreign key directly.
+`:sorting_column` - Specifies the column of the associated model to be used for sorting in the dropdown menu.  
+If `sorting_column` is omitted and `sort_by` is specified, the value of `sort_by` will be used.  
+If neither is specified, sorting will be done using the foreign key.  
+For `HasMany` associations, sorting is based on the count, so this option is not referenced in the table views.  
 
-`:class_name` (deprecated) - Specifies the name of the associated class.
+`:class_name` - Specifies the name of the associated class.
 
 **Field::HasOne**
 
@@ -144,22 +152,36 @@ Default is `false`.
 For example:
 
 ```ruby
-  cities: Field::HasMany.with_options(
+  city: Field::HasOne.with_options(
     searchable: true,
     searchable_fields: ['name'],
   )
 ```
 
 with this, you will be able to search through the column `name` from the
-association `has_many :cities`, from your model.
+association `has_one :city`, from your model.
 
-`:class_name` (deprecated) - Specifies the name of the associated class.
+`:sortable` - Specifies if sorting should be enabled in the table views.  
+Default is `true`.  
+
+`:sorting_column` - Specifies the column of the associated model to be used for sorting in the table views and dropdown menu.  
+If `sorting_column` is omitted and `order` is specified, the value of `order` will be used.  
+If neither is specified, sorting will be done using the foreign key.  
+
+`:class_name` - Specifies the name of the associated class.
 
 **Field::Number**
 
 `:searchable` - Specify if the attribute should be considered when searching.
 Note that currently number fields are searched like text, which may yield
 more results than expected. Default is `false`.
+
+`:sortable` - Specifies if sorting should be enabled in the table views.  
+Default is `true`.  
+
+`:sorting_column` - Specifies the column to be used for sorting in the table view.  
+By default, the column itself is used, but when used as a virtual column,  
+a custom sorting column can be specified.  
 
 `:decimals` - Set the number of decimals to display. Defaults to `0`.
 
@@ -209,7 +231,17 @@ Default is `[]`.
 `:order` - What to sort the association by in the form select.
 Default is `nil`.
 
+`:sortable` - Specifies if sorting should be enabled in the table views.  
+Default is `true`.  
+
 **Field::DateTime**
+
+`:sortable` - Specifies if sorting should be enabled in the table views.  
+Default is `true`.  
+
+`:sorting_column` - Specifies the column to be used for sorting in the table view.  
+By default, the column itself is used, but when used as a virtual column,  
+a custom sorting column can be specified.  
 
 `:format` - Specify what format, using `strftime` you would like `DateTime`
 objects to display as.
@@ -218,6 +250,13 @@ objects to display as.
 in.
 
 **Field::Date**
+
+`:sortable` - Specifies if sorting should be enabled in the table views.  
+Default is `true`.  
+
+`:sorting_column` - Specifies the column to be used for sorting in the table view.  
+By default, the column itself is used, but when used as a virtual column,  
+a custom sorting column can be specified.  
 
 `:format` - Specify what format, using `strftime` you would like `Date`
 objects to display as.
@@ -248,12 +287,26 @@ If no collection is provided and no enum can be detected, the list of options wi
 `:searchable` - Specify if the attribute should be considered when searching.
 Default is `true`.
 
+`:sortable` - Specifies if sorting should be enabled in the table views.  
+Default is `true`.  
+
+`:sorting_column` - Specifies the column to be used for sorting in the table view.  
+By default, the column itself is used, but when used as a virtual column,  
+a custom sorting column can be specified.  
+
 `:include_blank` - Similar to [the option of the same name accepted by Rails helpers](https://api.rubyonrails.org/classes/ActionView/Helpers/FormOptionsHelper.html). If provided, a "blank" option will be added first to the list of options, with the value of `include_blank` as label.
 
 **Field::String**
 
 `:searchable` - Specify if the attribute should be considered when searching.
 Default is `true`.
+
+`:sortable` - Specifies if sorting should be enabled in the table views.  
+Default is `true`.  
+
+`:sorting_column` - Specifies the column to be used for sorting in the table view.  
+By default, the column itself is used, but when used as a virtual column,  
+a custom sorting column can be specified.  
 
 `:truncate` - Set the number of characters to display in the index view.
 Defaults to `50`.
@@ -263,13 +316,30 @@ Defaults to `50`.
 `:searchable` - Specify if the attribute should be considered when searching.
 Default is `false`.
 
+`:sortable` - Specifies if sorting should be enabled in the table views.  
+Default is `true`.  
+
+`:sorting_column` - Specifies the column to be used for sorting in the table view.  
+By default, the column itself is used, but when used as a virtual column,  
+a custom sorting column can be specified.  
+
 `:truncate` - Set the number of characters to display in the index view.
 Defaults to `50`.
+
+`:input_options` - Options to customize the text area in form view.
+Example: `.with_options(input_options: { rows: 20 })`
 
 **Field::Url**
 
 `:searchable` - Specify if the attribute should be considered when searching.
 Default is `true`.
+
+`:sortable` - Specifies if sorting should be enabled in the table views.  
+Default is `true`.  
+
+`:sorting_column` - Specifies the column to be used for sorting in the table view.  
+By default, the column itself is used, but when used as a virtual column,  
+a custom sorting column can be specified.  
 
 `:truncate` - Set the number of characters to display in the index view.
 Defaults to `50`.
@@ -281,6 +351,9 @@ Defaults is `{}`.
 
 `:searchable` - Specify if the attribute should be considered when searching.
 Default is `false`.
+
+`:sortable` - Specifies if sorting should be enabled in the table views.  
+Default is `false`.  
 
 `:truncate` - Set the number of characters to display in the views.
 Defaults to `50`.
@@ -402,4 +475,167 @@ en:
     field_hints:
       customer:
         email: field_hint
+```
+
+## Grouped Attributes
+
+You may have models with a large number of fields and therefore you might want to group them in a meaningul way:
+
+```ruby
+class UserDashboard < Administrate::BaseDashboard
+  SHOW_PAGE_ATTRIBUTES = {
+    "" => [:username],
+    "Personal Information" => [:first_name, :last_name, :email],
+    "Address" => [:address_line_one, :address_line_two, :address_city, :address_state, :address_country]
+  }
+
+  FORM_ATTRIBUTES = {
+    "" => [:username, :password, :password_confirmation],
+    "personal_information" => [:first_name, :last_name, :email],
+    "address" => [:address_line_one, :address_line_two, :address_city, :address_state, :address_country]
+  }
+end
+```
+
+You can optionally translate your group labels:
+
+```yaml
+en:
+  helpers:
+    label:
+      user:
+        address: Address
+        personal_information: Personal Information
+```
+
+If not defined (see `SHOW_PAGE_ATTRIBUTES` above), Administrate will default to the given strings.
+
+## Virtual Attributes
+
+For all field types, you can use the `getter` option to change where the data is retrieved from or to set the data directly.
+
+By using this, you can define an attribute in `ATTRIBUTE_TYPES` that doesn’t exist in the model, and use it for various purposes.
+
+### Attribute Aliases
+
+You can create an alias for an attribute. For example:
+
+```ruby
+  ATTRIBUTE_TYPES = {
+    shipped_at: Field::DateTime,
+    shipped_on: Field::Date.with_options(
+      getter: :shipped_at
+    )
+  }
+  COLLECTION_ATTRIBUTES = [
+    :shipped_on
+  }
+  SHOW_PAGE_ATTRIBUTES = [
+    :shipped_at
+  }
+```
+
+In this example, a virtual attribute `shipped_on` based on the value of `shipped_at` is defined as a `Date` type and used for display on the index page (this can help save table cell space).
+
+### Decorated Attributes
+
+You can also use this to decorate data. For example:
+
+```ruby
+  ATTRIBUTE_TYPES = {
+    price: Field::Number,
+    price_including_tax: Field::Number.with_options(
+      getter: -> (field) {
+        field.resource.price * 1.1 if field.resource.price.present?
+      }
+    )
+  }
+```
+
+### Composite Attributes
+
+You can dynamically create a virtual attribute by combining multiple attributes for display. For example:
+
+```ruby
+  ATTRIBUTE_TYPES = {
+    first_name: Field::String,
+    last_name: Field::String,
+    full_name: Field::String.with_options(
+      getter: -> (field) {
+        [
+          field.resource.first_name,
+          field.resource.last_name
+        ].compact_blank.join(' ')
+      }
+    )
+  }
+```
+
+## Virtual Fields
+
+Custom fields can also be defined using virtual fields.
+
+```ruby
+  ATTRIBUTE_TYPES = {
+    id: Field::Number,
+    receipt: Field::ReceiptLink
+  }
+```
+
+```ruby
+module Administrate
+  module Field
+    class ReceiptLink < Base
+      def data
+        resource.id
+      end
+
+      def filename
+        "receipt-#{data}.pdf"
+      end
+
+      def url
+        "/files/receipts/#{filename}"
+      end
+    end
+  end
+end
+```
+
+```erb
+<%= link_to field.filename, field.url %>
+```
+
+### Custom Actions via Virtual Field
+
+By creating custom fields that are not dependent on specific attributes, you can insert custom views into any screen.
+For example, you can add custom buttons like this:
+
+```ruby
+  ATTRIBUTE_TYPES = {
+    id: Field::Number,
+    custom_index_actions: Field::CustomActionButtons,
+    custom_show_actions: Field::CustomActionButtons,
+  }
+```
+
+```ruby
+module Administrate
+  module Field
+    class CustomActionButtons < Base
+      def data
+        resource.id
+      end
+    end
+  end
+end
+```
+
+```erb
+<%# app/views/fields/custom_action_buttons/_index.html.erb %>
+<% if field.data.present? %>
+  <%= button_to "some action 1", [:some_action_1, namespace, field.resource] %>
+  <%= button_to "some action 2", [:some_action_2, namespace, field.resource] %>
+  <%= button_to "some action 3", [:some_action_3, namespace, field.resource] %>
+<% end %>
 ```

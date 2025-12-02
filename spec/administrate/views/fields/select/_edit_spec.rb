@@ -9,17 +9,20 @@ describe "fields/select/_form", type: :view do
       attribute: :email_subscriber,
       data: false,
       selectable_options: [true, false, nil],
-      include_blank_option: false,
+      tag_options: {include_blank: false},
+      html_options: {data: {controller: "select"}}
     )
 
-    render(
-      partial: "fields/select/form",
-      locals: { field: select, f: form_builder(customer) },
-    )
+    fields model: customer do |f|
+      render(
+        partial: "fields/select/form",
+        locals: {field: select, f: f}
+      )
+    end
 
     expect(rendered).to have_css(
-      %{select[name="customer[email_subscriber]"]
-        option[value="false"][selected="selected"]},
+      %(select[name="customer[email_subscriber]"][data-controller~=select]
+        option[value="false"][selected="selected"])
     )
   end
 
@@ -30,34 +33,20 @@ describe "fields/select/_form", type: :view do
       attribute: :email_subscriber,
       data: "Yes",
       selectable_options: ["Yes", "No"],
-      include_blank_option: "Unknown",
+      tag_options: {include_blank: "Unknown"},
+      html_options: {data: {controller: "select"}}
     )
 
-    render(
-      partial: "fields/select/form",
-      locals: { field: select, f: form_builder(customer) },
-    )
+    fields model: customer do |f|
+      render(
+        partial: "fields/select/form",
+        locals: {field: select, f: f}
+      )
+    end
 
     expect(rendered).to have_css(
-      %{select[name="customer[email_subscriber]"] option[value=""]},
-      text: "Unknown",
+      %(select[name="customer[email_subscriber]"][data-controller~="select"] option[value=""]),
+      text: "Unknown"
     )
-  end
-
-  def form_builder(object)
-    ActionView::Helpers::FormBuilder.new(
-      object.model_name.singular,
-      object,
-      build_template,
-      {},
-    )
-  end
-
-  def build_template
-    Object.new.tap do |template|
-      template.extend ActionView::Helpers::FormHelper
-      template.extend ActionView::Helpers::FormOptionsHelper
-      template.extend ActionView::Helpers::FormTagHelper
-    end
   end
 end

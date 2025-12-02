@@ -1,4 +1,3 @@
-require "jquery-rails"
 require "kaminari"
 require "dartsass-sprockets"
 require "selectize-rails"
@@ -13,7 +12,6 @@ require "administrate/order"
 require "administrate/resource_resolver"
 require "administrate/search"
 require "administrate/namespace"
-require "administrate/namespace/resource"
 
 module Administrate
   class Engine < ::Rails::Engine
@@ -25,8 +23,14 @@ module Administrate
     initializer "administrate.assets.precompile" do |app|
       app.config.assets.precompile += [
         "administrate/application.js",
-        "administrate/application.css",
+        "administrate/application.css"
       ]
+    end
+
+    initializer "administrate.action_text" do
+      ActiveSupport.on_load :action_text_rich_text do
+        require "administrate/field/rich_text"
+      end
     end
 
     def self.add_javascript(script)
