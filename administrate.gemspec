@@ -15,7 +15,6 @@ Gem::Specification.new do |s|
 
 
   s.add_dependency "jquery-rails", ">= 4.0"
-  s.add_dependency "kaminari", ">= 1.0"
   s.add_dependency "dartsass-sprockets", ">= 3.0"
   s.add_dependency "selectize-rails", "~> 0.6"
   s.add_dependency "actionpack", ">= 6.0", "< 9.0"
